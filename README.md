@@ -13,6 +13,27 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Publish with GitHub Pages
+
+This project is configured as a static Next.js export. `npm run build` writes the site to `out/`, and `.github/workflows/deploy-pages.yml` publishes it whenever `main` is pushed.
+
+1. On GitHub, create an **empty public repository** named `impactengineer87.github.io` under the `impactengineer87` account. This exact name makes the portfolio available at `https://impactengineer87.github.io/` without a repository path prefix.
+2. In the repository, go to **Settings → Pages → Build and deployment** and set **Source** to **GitHub Actions**.
+3. From this project folder, run:
+
+   ```powershell
+   git init
+   git add .
+   git commit -m "Publish portfolio"
+   git branch -M main
+   git remote add origin https://github.com/impactengineer87/impactengineer87.github.io.git
+   git push -u origin main
+   ```
+
+4. Check the repository's **Actions** tab for the deployment result, then open `https://impactengineer87.github.io/`.
+
+Before publishing, replace `hello@example.com` in `components/Contact.tsx` with your real contact address. If you choose a different repository name, the site will have a `/repository-name/` URL and the Next.js path configuration will need to change.
+
 ## Add project screenshots
 
 The projects live in `components/Work.tsx`. Vertigo uses the supplied screenshot at `public/work/vertigo.png`. The Trading Bot case has a linked, static dashboard interface preview at `/work/trading`, based on the supplied reference. It uses sample data and does not connect to a broker or place orders. The other projects use conceptual illustrations. To add another screenshot:
