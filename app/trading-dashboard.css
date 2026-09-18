@@ -1,0 +1,128 @@
+.trading-page { min-height: 100vh; background: #0d1117; color: #f6f8fc; }
+.trading-preview-note { min-height: 46px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 10px 20px; color: #c4d2df; background: #17202a; border-bottom: 1px solid #344054; font-size: 12px; }
+.trading-preview-note a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+.trading-preview-note a:focus-visible { outline: 2px solid #41dab0; outline-offset: 3px; }
+.trading-ui { min-width: 320px; min-height: calc(100vh - 46px); color: #f3f5fb; background: #0e1117; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 1.35; }
+.trading-ui * { box-sizing: border-box; }
+.trading-ui h1, .trading-ui h2, .trading-ui p { margin: 0; }
+.trading-ui a { color: inherit; text-decoration: none; }
+.trading-topbar { height: 62px; display: grid; grid-template-columns: minmax(210px, 1fr) auto minmax(380px, 1fr); align-items: center; gap: 20px; padding: 0 16px; border-bottom: 1px solid #344055; background: #0e1117; }
+.trading-brand { display: flex; align-items: center; gap: 11px; white-space: nowrap; }
+.trading-brand strong { display: block; font-size: 15px; line-height: 1.1; }
+.trading-brand small { display: block; margin-top: 3px; color: #9aacc6; font-size: 10px; }
+.trading-bot { font-size: 21px; }
+.trading-topnav, .trading-session { display: flex; align-items: center; gap: 7px; }
+.trading-topnav > span { padding: 7px 14px; border-radius: 7px; color: #a8b7cf; white-space: nowrap; }
+.trading-topnav > span.active { color: #b0c8fa; background: #1d2a43; }
+.trading-session { justify-content: flex-end; gap: 21px; color: #9eabc0; white-space: nowrap; font-size: 11px; }
+.trading-session i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #42d3a7; box-shadow: 0 0 9px #42d3a7; }
+.trading-session strong { color: #35cc9f; font-size: 11px; }
+.trading-switch { position: relative; width: 42px; height: 24px; border: 1px solid #36d3a4; border-radius: 20px; }
+.trading-switch::after { position: absolute; top: 3px; right: 3px; width: 16px; height: 16px; content: ""; border-radius: 50%; background: #39c99b; }
+.trading-admin { padding: 6px 10px; border: 1px solid #344055; border-radius: 7px; background: #1b2637; }
+.trading-body { display: grid; grid-template-columns: 214px minmax(0, 1fr); min-height: calc(100vh - 108px); }
+.trading-sidebar { padding: 15px 4px 22px; border-right: 5px solid #27354e; background: #131820; }
+.trading-side-heading { margin: 0 8px 5px; color: #a3bce2; font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.trading-side-links { display: grid; gap: 2px; }
+.trading-side-links > span { margin-right: 6px; padding: 8px 10px; color: #bfd1ec; border-radius: 6px; font-size: 12px; }
+.trading-side-links > span.active { color: #69a4ff; background: #1d2b40; }
+.trading-assets-heading { margin-top: 20px; padding-top: 10px; border-top: 1px solid #34445e; }
+.trading-assets { display: grid; gap: 4px; margin-right: 6px; }
+.trading-asset { min-height: 31px; display: flex; align-items: center; gap: 5px; padding: 0 10px; border-radius: 5px; background: #1b283b; }
+.trading-asset strong { margin-right: auto; font-size: 11px; }
+.trading-asset .buy, .trading-asset .sell { padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: 800; }
+.trading-asset .buy { color: #45ddaa; background: #1e4541; }
+.trading-asset .sell { color: #ff6570; background: #49323c; }
+.trading-remove { color: #a7bdd9; font-size: 12px; }
+.trading-content { min-width: 0; padding: 20px 22px 50px; }
+.trading-heading { margin-bottom: 19px; }
+.trading-heading h1 { font-size: 17px; font-weight: 800; }
+.trading-heading p { margin-top: 2px; color: #b8c7e2; font-size: 12px; }
+.trading-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.trading-metric { position: relative; min-height: 120px; display: flex; flex-direction: column; justify-content: center; padding: 14px 16px; overflow: hidden; border: 1px solid #2c3c55; border-radius: 16px; background: #1a2536; }
+.trading-metric::before { position: absolute; inset: 0 0 auto; height: 2px; content: ""; background: #42d5a6; }
+.trading-metric.sell::before { background: #f56a79; }
+.trading-metric.trades::before { background: #f9ca54; }
+.trading-metric.profit::before { background: #9375ff; }
+.trading-metric-icon { display: block; height: 27px; color: #68dcb0; font-size: 25px; line-height: 1; }
+.trading-metric.sell .trading-metric-icon { color: #f56a79; }
+.trading-metric.trades .trading-metric-icon { color: #70d8ac; }
+.trading-metric > strong { font-family: Consolas, monospace; font-size: 25px; line-height: 1; }
+.trading-metric.profit > strong { color: #39cfa1; }
+.trading-metric > span:not(.trading-metric-icon) { color: #c8d8f4; font-size: 11px; }
+.trading-metric small { color: #a7bbd9; font-size: 10px; }
+.trading-risk { min-height: 62px; display: grid; grid-template-columns: 1.3fr repeat(3, .9fr); align-items: center; margin-top: 15px; padding: 10px 18px; border: 1px solid #2f3e56; border-radius: 16px; background: #1a2536; }
+.trading-risk > div { min-width: 0; padding: 0 14px; border-left: 1px solid #2d3b53; }
+.trading-risk > div:first-child { padding-left: 0; border-left: 0; }
+.trading-risk strong, .trading-risk small { display: block; }
+.trading-risk strong { font-family: Consolas, monospace; font-size: 15px; }
+.trading-risk > div:first-child strong { font-family: Arial, Helvetica, sans-serif; font-size: 12px; }
+.trading-risk .positive { color: #43d6a8; }
+.trading-risk small { overflow: hidden; color: #a7bce0; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.trading-broker { min-height: 72px; display: grid; grid-template-columns: 1.6fr 1.2fr auto; align-items: center; gap: 16px; margin-top: 16px; padding: 12px 18px; border: 1px solid #255950; border-radius: 16px; background: #192535; }
+.trading-broker strong, .trading-broker small { display: block; }
+.trading-broker strong { font-size: 14px; }
+.trading-broker small { margin-top: 3px; color: #a7bfdc; font-size: 10px; }
+.trading-broker p { color: #ff9a4e; font-size: 10px; font-weight: 700; line-height: 1.1; }
+.trading-broker > span { padding: 7px 12px; border-radius: 6px; background: #23324e; white-space: nowrap; font-size: 11px; font-weight: 800; }
+.trading-control { margin-top: 17px; padding: 22px 24px 0; border: 1px solid #33425c; border-radius: 17px 17px 0 0; background: #172231; }
+.trading-control-heading { display: flex; justify-content: space-between; gap: 20px; }
+.trading-control-heading > div:first-child > span { color: #a7c8fa; font-size: 10px; font-weight: 800; letter-spacing: .1em; }
+.trading-control-heading h2 { margin-top: 5px; font-size: 17px; }
+.trading-control-heading p { margin-top: 6px; color: #c0d0ed; font-size: 12px; }
+.trading-control-actions { display: flex; align-items: start; gap: 10px; padding-top: 3px; white-space: nowrap; }
+.trading-control-actions span { padding: 7px 12px; border: 1px solid #344460; border-radius: 7px; color: #c4d9f8; font-size: 10px; font-weight: 800; }
+.trading-control-actions span:first-child { border-color: #246455; border-radius: 20px; color: #3bd5aa; background: #173d39; }
+.trading-setting-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+.trading-setting { min-width: 0; padding: 18px; border: 1px solid #344762; border-radius: 12px; background: #121c29; }
+.trading-setting > strong { font-size: 13px; }
+.trading-setting p { margin-top: 4px; color: #c0d2ee; font-size: 12px; }
+.trading-setting > div { display: flex; align-items: center; gap: 10px; margin-top: 17px; }
+.trading-setting > div span:first-child { min-width: 110px; padding: 10px 12px; border: 1px solid #354660; border-radius: 9px; color: #aab4c6; font-family: Consolas, monospace; font-size: 18px; font-weight: 800; }
+.trading-save { padding: 14px 17px; border-radius: 8px; color: #aabbd8; background: #2d528c; font-size: 11px; font-weight: 800; }
+.trading-setting small { display: block; margin-top: 11px; color: #53d9aa; font-size: 11px; }
+.trading-saved { margin-top: 18px; padding: 16px 18px; border: 1px solid #385471; border-radius: 12px; background: #172634; }
+.trading-saved > div:first-child { display: flex; justify-content: space-between; gap: 12px; }
+.trading-saved > div:first-child strong { font-size: 13px; }
+.trading-saved > div:first-child span { color: #9cece4; font-size: 12px; }
+.trading-chips { display: flex; gap: 7px; margin-top: 10px; }
+.trading-chips span { padding: 2px 6px; border: 1px solid #307760; border-radius: 4px; color: #6de4b2; background: #1b403d; font-size: 10px; font-weight: 800; }
+.trading-saved p { margin-top: 11px; color: #c6d7f4; font-size: 11px; }
+.trading-motor { display: flex; gap: 14px; margin-top: 14px; padding: 12px 14px; border-radius: 9px; background: #203047; font-size: 11px; }
+.trading-motor span { color: #c6d5ee; }
+.trading-table-head { display: grid; grid-template-columns: .75fr 1fr 1.4fr 1.1fr 1.2fr 1.2fr; gap: 10px; margin-top: 20px; padding: 12px 10px; background: #121c29; color: #c3d5f5; font-size: 10px; font-weight: 800; }
+
+@media (max-width: 1300px) {
+  .trading-topbar { grid-template-columns: auto 1fr; }
+  .trading-topnav { justify-content: center; }
+  .trading-session { display: none; }
+  .trading-broker { grid-template-columns: 1fr auto; }
+  .trading-broker p { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (max-width: 850px) {
+  .trading-topbar { height: auto; min-height: 62px; grid-template-columns: 1fr; gap: 9px; padding-block: 10px; }
+  .trading-topnav { justify-content: start; overflow-x: auto; }
+  .trading-topnav > span { padding: 6px 9px; }
+  .trading-body { grid-template-columns: 1fr; }
+  .trading-sidebar { display: none; }
+  .trading-content { padding: 18px 14px 40px; }
+  .trading-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trading-risk { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .trading-risk > div:nth-child(3) { border-left: 0; padding-left: 0; }
+  .trading-setting-grid { grid-template-columns: 1fr; }
+  .trading-control-heading { display: block; }
+  .trading-control-actions { margin-top: 12px; }
+  .trading-table-head { overflow-x: auto; white-space: nowrap; }
+}
+@media (max-width: 520px) {
+  .trading-preview-note { align-items: start; flex-direction: column; gap: 4px; }
+  .trading-metric { min-height: 103px; padding: 11px; }
+  .trading-metric > strong { font-size: 21px; }
+  .trading-broker { grid-template-columns: 1fr; }
+  .trading-broker p { grid-column: auto; grid-row: auto; }
+  .trading-broker > span { justify-self: start; }
+  .trading-control { padding: 16px 13px 0; }
+  .trading-control-actions { flex-wrap: wrap; }
+  .trading-saved > div:first-child { flex-direction: column; }
+  .trading-motor { flex-direction: column; gap: 3px; }
+}
