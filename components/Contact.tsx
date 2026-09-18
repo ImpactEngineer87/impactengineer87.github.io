@@ -6,7 +6,7 @@ export default function Contact() {
         <h2>Have something<br /><em>complex to solve?</em></h2>
         <div className="contact-row">
           <p>Tell me what you&apos;re building. I&apos;d be glad to explore how the pieces could work together.</p>
-          <a className="button button-light" href="mailto:hello@example.com">Start a conversation <span aria-hidden="true">↗</span></a>
+          <a className="button button-light" href="mailto:thandothomo01@gmail.com">Start a conversation <span aria-hidden="true">↗</span></a>
         </div>
       </div>
       <footer className="site-footer site-shell">
