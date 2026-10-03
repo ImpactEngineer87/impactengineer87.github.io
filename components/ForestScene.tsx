@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ACESFilmicToneMapping, AdditiveBlending, BufferGeometry, CanvasTexture, Color,
   DirectionalLight, DoubleSide, Float32BufferAttribute, FogExp2, Group,
@@ -10,7 +10,11 @@ import {
 } from "three";
 import { createBirdModel } from "@/lib/forestBirds3D";
 import { createForestSimulation3D } from "@/lib/forestSimulation3D";
-import { createForestWorld3D } from "@/lib/forestWorld3D";
+import { createForestWorld3D, terrainHeight } from "@/lib/forestWorld3D";
+import { createGrasslandAnimals3D } from "@/lib/grasslandAnimals3D";
+import { createRealisticWildlife3D } from "@/lib/realisticWildlife3D";
+import { BRANCH_NAVIGATION, createGrasslandNavigation3D, LEAF_STEM, navigationLeafWidth } from "@/lib/grasslandNavigation3D";
+import { paintGrasslandFallback } from "@/lib/grasslandFallback";
 
 export type WindReading = { speed: number; power: number; direction: number };
 export type NavigationReading = { id: string; x: number; y: number; scale: number; rotation: number; visible: boolean };
@@ -21,13 +25,6 @@ type Props = {
 };
 
 const LEAF_COLORS = ["#afbe62", "#85a45a", "#c3a655", "#cfbd76"];
-const NAVIGATION = [
-  { id: "home", desktop: [.16, .46], mobile: [.23, .39], depth: 10 },
-  { id: "about", desktop: [.21, .7], mobile: [.24, .58], depth: 9 },
-  { id: "experience", desktop: [.82, .45], mobile: [.76, .46], depth: 11 },
-  { id: "work", desktop: [.78, .64], mobile: [.76, .69], depth: 8.5 },
-  { id: "contact", desktop: [.85, .8], mobile: [.29, .8], depth: 9.5 },
-];
 
 function glowTexture() {
   const canvas = document.createElement("canvas");
@@ -77,46 +74,9 @@ function lightShafts() {
   return { group, dispose: () => { geometry.dispose(); material.dispose(); texture.dispose(); } };
 }
 
-function paintFallback(canvas: HTMLCanvasElement, width: number, height: number) {
-  const context = canvas.getContext("2d");
-  if (!context) return;
-  canvas.width = width;
-  canvas.height = height;
-  const sky = context.createLinearGradient(0, 0, 0, height);
-  sky.addColorStop(0, "#d7e1c9");
-  sky.addColorStop(.4, "#f0edda");
-  sky.addColorStop(1, "#344c32");
-  context.fillStyle = sky;
-  context.fillRect(0, 0, width, height);
-  context.fillStyle = "#c2b38e";
-  context.beginPath();
-  context.moveTo(width * .55, height * .45);
-  context.bezierCurveTo(width * .58, height * .68, width * .3, height * .78, width * .36, height);
-  context.lineTo(width * .68, height);
-  context.bezierCurveTo(width * .45, height * .78, width * .63, height * .67, width * .56, height * .45);
-  context.fill();
-  for (let side = 0; side < 2; side++) {
-    const x = width * (side ? .86 : .12);
-    context.strokeStyle = "#4b5037";
-    context.lineWidth = width * .055;
-    context.beginPath();
-    context.moveTo(x, height);
-    context.bezierCurveTo(x - width * .03, height * .72, x + width * .025, height * .28, x, 0);
-    context.stroke();
-    for (let index = 0; index < 75; index++) {
-      const phase = index * 2.399;
-      const fx = x + Math.sin(phase) * width * .15;
-      const fy = (index % 15) / 15 * height * .4;
-      context.fillStyle = ["#557249", "#6b814f", "#8b995b"][index % 3];
-      context.beginPath();
-      context.ellipse(fx, fy, width * .032, height * .018, phase, 0, Math.PI * 2);
-      context.fill();
-    }
-  }
-}
-
 export default function ForestScene({ paused, onWindChange, onNavigationPositions }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [layoutRevision, setLayoutRevision] = useState(0);
   const pausedRef = useRef(paused);
   const callbacksRef = useRef({ onWindChange, onNavigationPositions });
   const updateActivityRef = useRef<(() => void) | null>(null);
@@ -128,6 +88,20 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
   useEffect(() => { callbacksRef.current = { onWindChange, onNavigationPositions }; }, [onWindChange, onNavigationPositions]);
 
   useEffect(() => {
+    const container = canvasRef.current?.parentElement;
+    if (!container) return;
+    let mobileLayout = container.clientWidth <= 650;
+    const layoutObserver = new ResizeObserver(() => {
+      const nextMobileLayout = container.clientWidth <= 650;
+      if (nextMobileLayout === mobileLayout) return;
+      mobileLayout = nextMobileLayout;
+      setLayoutRevision((revision) => revision + 1);
+    });
+    layoutObserver.observe(container);
+    return () => layoutObserver.disconnect();
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     const container = canvas?.parentElement;
     if (!canvas || !container) return;
@@ -136,33 +110,73 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
     const gl = canvas.getContext("webgl2", { alpha: false, antialias: true, powerPreference: "high-performance" });
     if (!gl) {
       canvas.dataset.renderMode = "fallback";
-      paintFallback(canvas, width, height);
-      const fallbackResize = new ResizeObserver(() => paintFallback(canvas, container.clientWidth, container.clientHeight));
+      let fallbackDisposed = false;
+      let wildlifeAtlas: HTMLImageElement | undefined;
+      let barkTexture: HTMLImageElement | undefined;
+      const atlasImage = new Image();
+      const barkImage = new Image();
+      const drawFallback = () => {
+        width = container.clientWidth;
+        height = container.clientHeight;
+        paintGrasslandFallback(canvas, width, height, wildlifeAtlas, barkTexture);
+        const leafWidth = navigationLeafWidth(width);
+        const leafHeight = leafWidth / 1.6;
+        callbacksRef.current.onNavigationPositions?.(BRANCH_NAVIGATION.map((item) => {
+          const [x, y] = width <= 650 ? item.mobile : item.desktop;
+          const angle = item.angle * Math.PI / 180;
+          const dx = (.5 - LEAF_STEM.x) * leafWidth;
+          const dy = (.5 - LEAF_STEM.y) * leafHeight;
+          return { id: item.id, x: x * width - (dx * Math.cos(angle) - dy * Math.sin(angle)),
+            y: y * height - (dx * Math.sin(angle) + dy * Math.cos(angle)), scale: 1, rotation: item.angle, visible: true };
+        }));
+      };
+      atlasImage.onload = () => {
+        if (fallbackDisposed) return;
+        wildlifeAtlas = atlasImage;
+        canvas.dataset.wildlifeDetail = "photographic";
+        drawFallback();
+      };
+      atlasImage.src = "/nature/wildlife-atlas.png";
+      barkImage.onload = () => {
+        if (fallbackDisposed) return;
+        barkTexture = barkImage;
+        canvas.dataset.barkDetail = "photographic";
+        drawFallback();
+      };
+      barkImage.src = "/nature/acacia-bark.png";
+      drawFallback();
+      const fallbackResize = new ResizeObserver(drawFallback);
       fallbackResize.observe(container);
       callbacksRef.current.onWindChange({ speed: 0, power: 0, direction: 0 });
-      return () => fallbackResize.disconnect();
+      return () => {
+        fallbackDisposed = true;
+        atlasImage.onload = null;
+        barkImage.onload = null;
+        fallbackResize.disconnect();
+      };
     }
 
     const renderer = new WebGLRenderer({ canvas, context: gl, antialias: true, alpha: false, powerPreference: "high-performance" });
     renderer.outputColorSpace = SRGBColorSpace;
     renderer.toneMapping = ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.12;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = PCFShadowMap;
     const mobile = width <= 650;
+    canvas.dataset.layoutMode = mobile ? "mobile" : "desktop";
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 1.5));
     renderer.setSize(width, height, false);
     canvas.dataset.renderMode = "webgl2";
 
     const scene = new Scene();
-    scene.background = new Color("#dce6d5");
-    scene.fog = new FogExp2("#d2dec4", .028);
+    scene.background = new Color("#e5e6ce");
+    scene.fog = new FogExp2("#e3dfbd", .012);
     const camera = new PerspectiveCamera(mobile ? 62 : 52, width / height, .1, 180);
     camera.position.set(0, 3.3, 16);
     camera.lookAt(0, 5, -20);
     camera.updateMatrixWorld();
-    scene.add(new HemisphereLight("#e6f0e3", "#4a5430", 1.8));
-    const sunlight = new DirectionalLight("#fff0cf", 3.2);
+    scene.add(new HemisphereLight("#fff3dd", "#77724b", 2.1));
+    const sunlight = new DirectionalLight("#ffe4ad", 3);
     sunlight.position.set(-15, 26, 9);
     sunlight.target.position.set(0, 0, -25);
     sunlight.castShadow = true;
@@ -178,11 +192,29 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
     sunlight.shadow.radius = 3;
     scene.add(sunlight, sunlight.target);
 
-    const world = createForestWorld3D(mobile);
+    let disposed = false;
+    canvas.dataset.barkDetail = "loading";
+    const world = createForestWorld3D(mobile, () => {
+      if (disposed) return;
+      canvas.dataset.barkDetail = "photographic";
+      updateActivityRef.current?.();
+    });
     scene.add(world.group);
+    const wildlife = createGrasslandAnimals3D(mobile, terrainHeight);
+    scene.add(wildlife.group);
+    canvas.dataset.wildlifeDetail = "loading";
+    const realisticWildlife = createRealisticWildlife3D(mobile, terrainHeight, () => {
+      if (disposed) return;
+      wildlife.group.visible = false;
+      canvas.dataset.wildlifeDetail = "photographic";
+      updateActivityRef.current?.();
+    });
+    scene.add(realisticWildlife.group);
+    const navigation = createGrasslandNavigation3D(world.barkMaterial);
+    scene.add(navigation.group);
     const shafts = lightShafts();
     scene.add(shafts.group);
-    const simulation = createForestSimulation3D({ leafCount: mobile ? 42 : 58, birdCount: 5 });
+    const simulation = createForestSimulation3D({ leafCount: mobile ? 24 : 36, birdCount: 5 });
     const flyingGeometry = world.leafGeometry.clone();
     const flyingMaterial = new MeshStandardMaterial({ map: world.leafMaterial.map, color: "#dae1a4", roughness: .82, metalness: 0, side: DoubleSide });
     const flyingLeaves = new InstancedMesh(flyingGeometry, flyingMaterial, simulation.leaves.length);
@@ -216,7 +248,6 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
     let elapsed = 0;
     let lastReport = -1;
     let visible = true;
-    let disposed = false;
     let contextLost = false;
     let scrollAmount = 0;
     const pointer = new Vector2();
@@ -224,7 +255,7 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const projection = new Vector3();
     const up = new Vector3(0, 1, 0);
-    const anchors = NAVIGATION.map((item) => ({ ...item, base: new Vector3() }));
+    const anchors = navigation.anchors;
 
     const canAnimate = () => !disposed && !contextLost && !pausedRef.current && !reducedMotion.matches && visible && !document.hidden;
     const measureAnchors = () => {
@@ -233,10 +264,7 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
       camera.position.set(0, 3.3, 16);
       camera.lookAt(0, 5, -20);
       camera.updateMatrixWorld();
-      for (const anchor of anchors) {
-        const [x, y] = width <= 650 ? anchor.mobile : anchor.desktop;
-        anchor.base.set(x * 2 - 1, 1 - y * 2, .5).unproject(camera).sub(camera.position).normalize().multiplyScalar(anchor.depth).add(camera.position);
-      }
+      navigation.measure(camera, width, height);
       camera.position.copy(savedPosition);
       camera.quaternion.copy(savedQuaternion);
       camera.updateMatrixWorld();
@@ -245,6 +273,8 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
       const still = reducedMotion.matches;
       const wind = simulation.wind;
       world.update(elapsed, still ? 0 : wind.power);
+      wildlife.update(elapsed, still ? 0 : wind.power);
+      realisticWildlife.update(elapsed, still ? 0 : wind.power);
       for (let index = 0; index < simulation.birds.length; index++) {
         const bird = simulation.birds[index];
         const model = birdModels[index];
@@ -282,14 +312,10 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
       const readings = anchors.map((anchor, index) => {
         const phase = index * 1.7;
         const motion = still ? 0 : elapsed;
-        const amplitude = still ? 0 : .4 + wind.power * .8;
         projection.copy(anchor.base);
-        projection.x += Math.sin(motion * .48 + phase) * amplitude + (still ? 0 : wind.x * .045);
-        projection.y += Math.cos(motion * .59 + phase) * amplitude * .65;
-        projection.z += Math.sin(motion * .34 + phase) * amplitude * 1.35;
         const distance = camera.position.distanceTo(projection);
         projection.project(camera);
-        return { id: anchor.id, x: (projection.x + 1) * width / 2, y: (1 - projection.y) * height / 2, scale: anchor.depth / distance, rotation: still ? 0 : Math.sin(motion * .65 + phase) * (7 + wind.power * 13), visible: projection.z > -1 && projection.z < 1 };
+        return { id: anchor.id, x: (projection.x + 1) * width / 2, y: (1 - projection.y) * height / 2, scale: anchor.depth / distance, rotation: anchor.angle + (still ? 0 : Math.sin(motion * .65 + phase) * (1.2 + wind.power * 2.8)), visible: projection.z > -1 && projection.z < 1 };
       });
       callbacksRef.current.onNavigationPositions?.(readings);
     };
@@ -298,6 +324,8 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
       canvas.dataset.caughtLeaves = String(simulation.stats.caughtLeaves);
       canvas.dataset.consumedLeaves = String(simulation.stats.consumedLeaves);
       canvas.dataset.sceneTriangles = String(renderer.info.render.triangles);
+      canvas.dataset.wildlife = "lion tiger giraffe";
+      canvas.dataset.attachedLeaves = String(anchors.length);
     };
     const tick = (time: number) => {
       frame = 0;
@@ -307,7 +335,7 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
       elapsed += dt;
       simulation.step(dt);
       smoothPointer.lerp(pointer, 1 - Math.exp(-dt * 2.3));
-      camera.position.set(smoothPointer.x * 1.2 + Math.sin(elapsed * .16) * .3, 3.3 - smoothPointer.y * .22 + Math.sin(elapsed * .31) * .045, 16 - scrollAmount * 3.2 + Math.sin(elapsed * .13) * .65);
+      camera.position.set(smoothPointer.x * .38 + Math.sin(elapsed * .16) * .08, 3.3 - smoothPointer.y * .12 + Math.sin(elapsed * .31) * .025, 16 - scrollAmount * 1.4 + Math.sin(elapsed * .13) * .18);
       camera.up.copy(up);
       camera.lookAt(smoothPointer.x * .25, 5 - smoothPointer.y * .3, -20);
       camera.updateMatrixWorld();
@@ -389,11 +417,14 @@ export default function ForestScene({ paused, onWindChange, onNavigationPosition
       pollenMaterial.dispose();
       pollenTexture.dispose();
       shafts.dispose();
+      navigation.dispose();
+      wildlife.dispose();
+      realisticWildlife.dispose();
       world.dispose();
       sunlight.shadow.map?.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [layoutRevision]);
 
-  return <canvas ref={canvasRef} className="forest-canvas" role="img" aria-label="An interactive three-dimensional woodland with sunlit trees, a winding dirt road, feathered birds banking between branches, and leaves flying and tumbling through the wind." />;
+  return <canvas ref={canvasRef} className="forest-canvas" role="img" aria-label="An interactive sunlit grassland with acacia trees, lions, tigers, giraffes, a winding dirt path, birds, and five navigation leaves growing from tree branches." />;
 }
