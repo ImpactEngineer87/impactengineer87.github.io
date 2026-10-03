@@ -1,0 +1,151 @@
+.forest-hero {
+  --sage-shadow: #537047;
+  --sage-base: #9fba73;
+  --sage-light: #d1dc96;
+  --moss-shadow: #3d5830;
+  --moss-base: #789453;
+  --moss-light: #b5c577;
+  --olive-shadow: #5d642e;
+  --olive-base: #a0aa58;
+  --olive-light: #d1d588;
+  --gold-shadow: #a18335;
+  --gold-base: #d6bb6a;
+  --gold-light: #eee0a4;
+  --amber-shadow: #9e652f;
+  --amber-base: #c99451;
+  --amber-light: #e4bd78;
+  --wind-sway: 2deg;
+  --wind-x: 4px;
+  --wind-y: -2px;
+  --wind-time: 5s;
+  position: relative;
+  isolation: isolate;
+  min-height: max(880px, 100svh);
+  overflow: hidden;
+  color: #263a29;
+  background: radial-gradient(ellipse at 52% 26%, #f9f8eb 4%, #dce5c8 55%, #6f8450 100%);
+}
+
+.forest-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
+.forest-atmosphere { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(ellipse 39% 24% at 50% 25%, rgba(248, 246, 221, .57), transparent 100%), linear-gradient(180deg, rgba(13, 29, 17, .24), transparent 16%, transparent 78%, rgba(15, 30, 16, .54)); }
+.forest-header { position: relative; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 24px; width: calc(100% - 96px); max-width: 1560px; min-height: 112px; margin: auto; color: #faf7de; text-shadow: 0 1px 9px rgba(19, 36, 19, .35); }
+.forest-brand { display: flex; align-items: center; gap: 15px; }
+.forest-monogram { font-family: Georgia, "Times New Roman", serif; font-size: 3.25rem; font-style: italic; line-height: .8; letter-spacing: -.13em; }
+.forest-monogram > span { color: #d1db9c; }
+.forest-brand > span:last-child { display: flex; flex-direction: column; gap: 7px; font-size: .92rem; font-weight: 600; letter-spacing: -.025em; }
+.forest-brand small { font-size: .51rem; letter-spacing: .19em; font-weight: 500; }
+.forest-availability { display: flex; align-items: center; gap: 10px; font-size: .69rem; letter-spacing: .015em; }
+.forest-availability > span:last-child { margin-left: 13px; font-size: 1.1rem; }
+.forest-status-dot { width: 6px; height: 6px; border-radius: 100%; background: #d0e3a4; box-shadow: 0 0 0 4px rgba(208, 227, 164, .1); }
+.forest-intro { position: relative; z-index: 2; width: min(730px, 70%); margin: 37px auto 0; text-align: center; text-shadow: 0 1px 18px rgba(255, 252, 225, .6); pointer-events: none; }
+.forest-kicker { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 0 0 22px; font-size: .56rem; font-weight: 500; letter-spacing: .21em; color: #607050; }
+.forest-kicker > span { width: 23px; height: 1px; background: #7c8e63; opacity: .6; }
+.forest-intro h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(3.2rem, 4.65vw, 5.25rem); font-weight: 400; line-height: 1.08; letter-spacing: -.052em; text-wrap: balance; }
+.forest-intro h1 em { color: #617541; letter-spacing: -.045em; }
+.forest-description { margin: 22px auto 0; font-size: .9rem; line-height: 1.75; color: #55624b; text-wrap: balance; }
+.forest-navigation { position: absolute; inset: 0; pointer-events: none; z-index: 4; perspective: 1000px; }
+.navigation-leaf { position: absolute; display: block; width: clamp(175px, 17.5vw, 245px); aspect-ratio: 1.6; pointer-events: auto; transform: translate(-50%, -50%); transform-style: preserve-3d; will-change: transform; -webkit-user-select: none; user-select: none; }
+.forest-hero[data-navigation-ready="true"] .navigation-leaf { top: 0; left: 0; }
+.forest-hero[data-navigation-ready="true"] .navigation-leaf-body { animation: none; transform-origin: 50% 50%; }
+.navigation-leaf-body { position: absolute; inset: 0; display: block; transform-origin: 20% 75%; animation: woodland-leaf-sway var(--wind-time) ease-in-out infinite; animation-delay: var(--leaf-delay, 0s); will-change: transform; }
+.navigation-leaf-art { display: block; width: 100%; height: 100%; filter: drop-shadow(2px 3px 1px rgba(27, 38, 15, .2)) drop-shadow(10px 20px 13px rgba(14, 29, 11, .24)); transition: filter .25s ease, transform .25s ease; transform: rotate(var(--leaf-angle, 0deg)); }
+.navigation-leaf-caption { position: absolute; inset: 37% 5% auto 18%; display: flex; flex-direction: column; align-items: center; gap: 7px; color: #22321b; text-shadow: 0 1px 1px rgba(255, 255, 212, .13); }
+.navigation-leaf-caption > small { font-family: Georgia, "Times New Roman", serif; font-size: .66rem; font-style: italic; opacity: .68; }
+.navigation-leaf-caption > span { font-size: clamp(.85rem, 1.13vw, 1.07rem); font-weight: 600; letter-spacing: -.035em; white-space: nowrap; }
+.leaf-link-arrow { display: inline-block; margin-left: 4px; font-size: .9em; font-weight: 400; opacity: .7; transition: transform .2s ease; }
+.navigation-leaf:hover .navigation-leaf-art, .navigation-leaf:focus-visible .navigation-leaf-art { filter: drop-shadow(3px 6px 2px rgba(22, 40, 17, .2)) drop-shadow(12px 23px 14px rgba(22, 40, 17, .35)) brightness(1.1); transform: rotate(var(--leaf-angle, 0deg)) scale(1.07); }
+.navigation-leaf:hover .leaf-link-arrow, .navigation-leaf:focus-visible .leaf-link-arrow { transform: translate(2px, -2px); }
+.navigation-leaf:focus-visible { outline: 2px solid #fffce0; outline-offset: 3px; border-radius: 40% 15% 45% 20%; }
+.navigation-leaf--home { left: 16%; top: 46%; --leaf-angle: -12deg; --leaf-delay: -.8s; }
+.navigation-leaf--about { left: 21%; top: 70%; --leaf-angle: 8deg; --leaf-delay: -2.4s; }
+.navigation-leaf--experience { left: 82%; top: 45%; --leaf-angle: 9deg; --leaf-delay: -1.2s; }
+.navigation-leaf--work { left: 78%; top: 64%; --leaf-angle: -8deg; --leaf-delay: -3.8s; }
+.navigation-leaf--contact { left: 85%; top: 80%; --leaf-angle: 4deg; --leaf-delay: -2.9s; }
+.forest-invitation { position: absolute; top: 56%; left: 50%; z-index: 2; width: 250px; margin: 0; transform: translateX(-50%); font-family: Georgia, "Times New Roman", serif; font-size: 1.13rem; font-style: italic; text-align: center; color: #f3efcf; text-shadow: 0 2px 10px rgba(18, 29, 12, .9); pointer-events: none; }
+.forest-invitation-line { display: block; width: 1px; height: 40px; margin: 0 auto 18px; background: linear-gradient(transparent, #e7e5b7); }
+.forest-invitation small { display: block; margin-top: 9px; font-family: Arial, Helvetica, sans-serif; font-size: .62rem; font-style: normal; letter-spacing: .015em; }
+.forest-look-hint { display: block; margin-top: 28px; color: #e2e9c7; font-family: Arial, Helvetica, sans-serif; font-size: .56rem; font-style: normal; letter-spacing: .035em; }
+.forest-footer { position: absolute; right: 48px; bottom: 31px; left: 48px; z-index: 5; display: flex; align-items: end; justify-content: space-between; gap: 20px; color: #f3f2d9; }
+.forest-weather { display: flex; align-items: center; gap: 13px; min-width: 200px; }
+.forest-weather > svg { width: 29px; height: 29px; flex: none; opacity: .8; }
+.forest-weather > div { display: flex; flex-direction: column; gap: 8px; }
+.forest-weather span { font-size: .55rem; letter-spacing: .15em; }
+.forest-weather small { font-family: Georgia, "Times New Roman", serif; font-size: .86rem; font-style: italic; opacity: .8; }
+.forest-scroll { position: absolute; bottom: 0; left: 50%; display: flex; flex-direction: column; align-items: center; gap: 15px; transform: translateX(-50%); color: #edeccc; text-shadow: 0 2px 8px rgba(18, 29, 12, .7); }
+.forest-scroll > span:first-child { font-size: .5rem; letter-spacing: .21em; }
+.forest-scroll > span:last-child { font-size: 1.5rem; font-weight: 300; animation: forest-path-arrow 3s ease-in-out infinite; }
+.forest-motion-button { display: inline-flex; align-items: center; gap: 9px; padding: 11px 15px; border: 1px solid rgba(242, 245, 218, .38); border-radius: 30px; color: inherit; background: rgba(26, 42, 23, .22); font-family: inherit; font-size: .65rem; cursor: pointer; transition: background .2s ease; backdrop-filter: blur(6px); }
+.forest-motion-button:hover { background: rgba(26, 42, 23, .5); }
+.forest-motion-button:focus-visible { outline: 2px solid #fffce0; outline-offset: 4px; }
+.forest-motion-button svg { width: 15px; height: 15px; }
+.forest-hero.is-paused .navigation-leaf-body, .forest-hero.is-paused .forest-scroll > span:last-child { animation-play-state: paused; }
+.forest-hero + .expertise-section .section-wave { display: none; }
+
+@keyframes woodland-leaf-sway {
+  0%, 100% { transform: translate(0, 0) rotate(calc(-1 * var(--wind-sway))); }
+  35% { transform: translate(var(--wind-x), var(--wind-y)) rotate(var(--wind-sway)); }
+  70% { transform: translate(calc(-.4 * var(--wind-x)), calc(-.3 * var(--wind-y))) rotate(calc(-.3 * var(--wind-sway))); }
+}
+@keyframes forest-path-arrow { 50% { transform: translateY(6px); } }
+
+@media (min-width: 1800px) {
+  .forest-intro { margin-top: 60px; }
+  .forest-hero { min-height: max(940px, 100svh); }
+}
+@media (max-width: 1000px) {
+  .forest-header { width: calc(100% - 64px); }
+  .forest-intro { margin-top: 55px; width: 80%; }
+  .forest-intro h1 { font-size: 3.6rem; }
+  .forest-availability { font-size: .6rem; }
+  .navigation-leaf { width: 195px; }
+  .navigation-leaf--home { left: 16%; top: 47%; }
+  .navigation-leaf--about { left: 18%; top: 71%; }
+  .navigation-leaf--experience { left: 83%; top: 46%; }
+  .navigation-leaf--work { left: 78%; top: 65%; }
+  .navigation-leaf--contact { left: 82%; top: 82%; }
+  .forest-footer { right: 32px; left: 32px; }
+}
+@media (max-width: 650px) {
+  .forest-hero { min-height: max(1000px, 100svh); }
+  .forest-atmosphere { background: radial-gradient(ellipse 105% 16% at 50% 22%, rgba(247, 245, 224, .96) 0%, rgba(247, 245, 224, .88) 45%, rgba(247, 245, 224, .3) 78%, transparent 100%), linear-gradient(180deg, transparent 80%, rgba(24, 41, 24, .38)); }
+  .forest-header { width: calc(100% - 40px); min-height: 88px; gap: 12px; }
+  .forest-brand { gap: 11px; }
+  .forest-monogram { font-size: 2.7rem; }
+  .forest-brand > span:last-child { font-size: .82rem; gap: 5px; }
+  .forest-brand small { font-size: .44rem; letter-spacing: .12em; }
+  .forest-availability { max-width: 122px; flex-wrap: wrap; justify-content: end; gap: 6px; font-size: .56rem; line-height: 1.4; text-align: right; }
+  .forest-availability > span:last-child { display: none; }
+  .forest-status-dot { width: 5px; height: 5px; }
+  .forest-intro { width: calc(100% - 30px); margin-top: 39px; }
+  .forest-kicker { margin-bottom: 20px; font-size: .45rem; letter-spacing: .12em; gap: 8px; }
+  .forest-kicker > span { width: 14px; }
+  .forest-intro h1 { font-size: clamp(2.2rem, 8.9vw, 3.5rem); letter-spacing: -.055em; }
+  .forest-description { width: 90%; margin-top: 20px; font-size: .8rem; line-height: 1.7; }
+  .forest-desktop-break { display: none; }
+  .navigation-leaf { width: clamp(136px, 39vw, 185px); transform: translate(-50%, -50%) scale(.9); }
+  .navigation-leaf-caption { gap: 5px; }
+  .navigation-leaf-caption > small { font-size: .55rem; }
+  .navigation-leaf-caption > span { font-size: .84rem; }
+  .navigation-leaf--home { left: 29%; top: 39%; }
+  .navigation-leaf--experience { left: 71%; top: 49%; }
+  .navigation-leaf--about { left: 29%; top: 60%; }
+  .navigation-leaf--work { left: 71%; top: 70%; }
+  .navigation-leaf--contact { left: 29%; top: 80%; }
+  .forest-invitation { top: 49%; left: 48%; width: 230px; font-size: .97rem; }
+  .forest-invitation-line { height: 24px; margin-bottom: 12px; }
+  .forest-invitation small { font-size: .54rem; }
+  .forest-look-hint { display: none; }
+  .forest-footer { right: 20px; bottom: 22px; left: 20px; align-items: center; gap: 10px; }
+  .forest-weather { min-width: 0; gap: 8px; }
+  .forest-weather > svg { width: 22px; height: 22px; }
+  .forest-weather span { font-size: .45rem; letter-spacing: .08em; }
+  .forest-weather small { font-size: .72rem; }
+  .forest-motion-button { padding: 10px 11px; font-size: .58rem; gap: 5px; }
+  .forest-scroll { bottom: 67px; }
+  .forest-scroll > span:first-child { font-size: .44rem; white-space: nowrap; }
+  .forest-scroll > span:last-child { font-size: 1.3rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .navigation-leaf-body, .forest-scroll > span:last-child { animation: none; }
+  .navigation-leaf-art, .leaf-link-arrow { transition: none; }
+}

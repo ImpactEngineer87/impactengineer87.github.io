@@ -1,14 +1,14 @@
 # Thando Thomo portfolio
 
-An editorial portfolio for Thando Thomo's software engineering work. The site presents five projects through concise case summaries and project-specific conceptual illustrations.
+A woodland-inspired portfolio for Thando Thomo's software engineering work. The landing page opens onto a sunlit forest and a winding earthen road, with leaf-shaped links to Home, About me, Experience, My work, and Contact me. The site presents five projects through concise case summaries and project-specific conceptual illustrations.
 
-Motion includes glossy water drops labelled with technologies used in this site or the featured work. They fall at varied positions and intervals over a calm, shaded water surface. Each impact sends perspective ripples across the surface; clicking the hero creates a drop at that position. The canvas pauses when the hero is offscreen and respects reduced-motion settings. Other sections use scroll reveals and animated system paths.
+The forest is a Three.js scene with a perspective camera, branching three-dimensional trees, uneven terrain, a dirt path, textured bark, curved leaves, ferns, grass, mist, sunlight, and shadows. Move your pointer to look around; scrolling gently moves the camera along the path. Random wind carries loose leaves through three-dimensional space with lift and tumbling, and the navigation leaves travel at different depths. Hover or focus a navigation leaf to hold it still. Feathered songbirds flap their articulated wings, glide, bank, and occasionally catch and consume leaves, which replenish over time. Click the scenery to stir up a gust, or use Pause scene for stillness. Animation pauses offscreen and in hidden tabs, respects reduced-motion settings, and adapts to mobile screens. A static woodland fallback keeps navigation available when WebGL 2 is unavailable. All textures are generated locally; there are no remote asset requests. Other sections use scroll reveals and animated system paths.
 
 ## Run locally
 
 ```powershell
-npm install
-npm run dev
+npm.cmd install
+npm.cmd run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
